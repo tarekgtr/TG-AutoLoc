@@ -1,0 +1,13 @@
+# Development profile: local PostgreSQL (docker compose), sample vehicles, Swagger enabled.
+spring:
+  datasource:
+    password: ${DB_PASSWORD:tgautoloc_dev}
+  flyway:
+    # db/sample contains clearly marked fictitious vehicles for local development only.
+    locations: classpath:db/migration,classpath:db/sample
+    # The sample migration is V1000; let later real migrations (V2, V3...) still apply on dev databases.
+    out-of-order: true
+
+logging:
+  level:
+    dz.tgautoloc: DEBUG

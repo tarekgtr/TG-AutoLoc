@@ -1,0 +1,5 @@
+# Only the website is exposed; the backend is reachable solely through the frontend's /api proxy.
+{$DOMAIN} {
+	encode zstd gzip
+	reverse_proxy frontend:3000
+}

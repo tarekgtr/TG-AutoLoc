@@ -1,0 +1,13 @@
+import { Suspense } from "react";
+import { setRequestLocale } from "next-intl/server";
+import { LoginForm } from "@/components/admin/LoginForm";
+
+export default async function LoginPage({ params }: { params: Promise<{ locale: string }> }) {
+  const { locale } = await params;
+  setRequestLocale(locale);
+  return (
+    <Suspense>
+      <LoginForm />
+    </Suspense>
+  );
+}

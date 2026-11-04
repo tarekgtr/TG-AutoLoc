@@ -1,0 +1,59 @@
+# TG AutoLoc – production stack for a small Azure VM (B1s, 1 GB RAM).
+# The database is Azure Database for PostgreSQL (managed), so it is not part of this file.
+# Images are built on your own computer and loaded on the VM (see README "Deploying to Azure").
+#   docker compose up -d
+# Configuration comes from .env next to this file (copy .env.example).
+
+name: tg-autoloc
+
+services:
+  backend:
+    image: tg-autoloc-backend:latest
+    restart: unless-stopped
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      DB_URL: jdbc:postgresql://${DB_HOST:?Set DB_HOST in .env}:5432/${DB_NAME:-tgautoloc}?sslmode=require
+      DB_USERNAME: ${DB_USERNAME:?Set DB_USERNAME in .env}
+      DB_PASSWORD: ${DB_PASSWORD:?Set DB_PASSWORD in .env}
+      STORAGE_LOCAL_PATH: /data/uploads
+      COOKIE_SECURE: "true"
+      FORWARD_HEADERS_STRATEGY: native
+      API_DOCS_ENABLED: "false"
+      ADMIN_BOOTSTRAP_USERNAME: ${ADMIN_BOOTSTRAP_USERNAME:-}
+      ADMIN_BOOTSTRAP_PASSWORD: ${ADMIN_BOOTSTRAP_PASSWORD:-}
+      # Sized for a 1 GB VM.
+      JAVA_OPTS: -Xmx320m -XX:MaxMetaspaceSize=128m -XX:+UseSerialGC -Xss512k
+    volumes:
+      # Uploaded vehicle images live on the VM's managed disk and survive restarts and updates.
+      - uploads:/data/uploads
+
+  frontend:
+    image: tg-autoloc-frontend:latest
+    restart: unless-stopped
+    depends_on:
+      - backend
+    environment:
+      BACKEND_INTERNAL_URL: http://backend:8080
+      NODE_OPTIONS: --max-old-space-size=192
+
+  # HTTPS reverse proxy: obtains and renews the Let's Encrypt certificate for $DOMAIN.
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    depends_on:
+      - frontend
+    environment:
+      DOMAIN: ${DOMAIN:?Set DOMAIN in .env}
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+      - caddy-config:/config
+
+volumes:
+  uploads:
+  caddy-data:
+  caddy-config:

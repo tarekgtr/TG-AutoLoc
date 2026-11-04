@@ -1,0 +1,115 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  .fonts-latin {
+    --font-body: var(--font-inter);
+    --font-display: var(--font-montserrat);
+  }
+  /* Cairo carries the Arabic glyphs; Latin text (brands, numbers) falls back to Inter. */
+  .fonts-arabic {
+    --font-body: var(--font-cairo), var(--font-inter);
+    --font-display: var(--font-cairo), var(--font-inter);
+  }
+
+  html {
+    -webkit-tap-highlight-color: transparent;
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-ink-50 text-ink-900 antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  h1,
+  h2,
+  h3 {
+    @apply font-display tracking-tight;
+  }
+
+  :focus-visible {
+    @apply outline-none ring-2 ring-brand-400 ring-offset-2 ring-offset-white;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}
+
+@layer components {
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-xl px-5 py-3 text-sm font-semibold
+      transition duration-200 disabled:cursor-not-allowed disabled:opacity-60;
+  }
+  .btn-sm {
+    @apply px-3.5 py-2 text-sm;
+  }
+  .btn-primary {
+    @apply btn bg-brand-400 text-ink-900 shadow-sm hover:bg-brand-300 active:bg-brand-500;
+  }
+  .btn-dark {
+    @apply btn bg-ink-900 text-white hover:bg-ink-800;
+  }
+  .btn-outline {
+    @apply btn border border-ink-200 bg-white text-ink-900 hover:border-ink-300 hover:bg-ink-50;
+  }
+  .btn-outline-light {
+    @apply btn border border-white/25 text-white hover:border-white/50 hover:bg-white/10;
+  }
+  .btn-whatsapp {
+    @apply btn bg-whatsapp text-white shadow-sm hover:bg-whatsapp-dark;
+  }
+  .btn-danger {
+    @apply btn bg-red-600 text-white hover:bg-red-700;
+  }
+  .btn-ghost {
+    @apply btn px-3 text-ink-600 hover:bg-ink-100 hover:text-ink-900;
+  }
+
+  .card {
+    @apply rounded-2xl border border-ink-100 bg-white shadow-card;
+  }
+
+  .label {
+    @apply mb-1.5 block text-sm font-medium text-ink-700;
+  }
+  .input {
+    @apply block w-full rounded-xl border border-ink-200 bg-white px-3.5 py-2.5 text-sm text-ink-900
+      placeholder:text-ink-400 transition focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-300/60
+      aria-[invalid=true]:border-red-500 aria-[invalid=true]:ring-red-200;
+  }
+  .field-error {
+    @apply mt-1.5 text-sm text-red-700;
+  }
+  .field-hint {
+    @apply mt-1.5 text-xs text-ink-500;
+  }
+
+  .section {
+    @apply py-16 sm:py-20;
+  }
+  .eyebrow {
+    @apply text-xs font-semibold uppercase tracking-[0.18em] text-brand-600;
+  }
+
+  .skeleton {
+    @apply animate-pulse rounded-lg bg-ink-100;
+  }
+}
+
+/* Arabic: no letter-spacing (it breaks joined letters). */
+:lang(ar) .eyebrow,
+:lang(ar) .tracking-tight,
+:lang(ar) .tracking-wide {
+  letter-spacing: 0;
+}
